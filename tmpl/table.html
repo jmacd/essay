@@ -1,0 +1,28 @@
+{{ $leftcol := .LeftCol }}
+<table>
+  {{ with .TopRow }}
+  <tr>
+    {{ range $tidx, $titem := . }}
+    <th>
+      {{ render $titem }}
+    </th>
+    {{ end }}
+  </tr>
+  {{ end }}
+  {{ range $xidx, $xitem := .Cells }}
+  <tr>
+    {{ range $yidx, $yitem := $xitem }}
+    {{ with $leftcol }}
+    {{ if (eq 0 $yidx) }}
+    <td>
+      {{ render (indexof $leftcol $xidx) }}
+    </td>
+    {{ end }}
+    {{ end }}
+    <td>
+      {{ render $yitem }}
+    </td>
+    {{ end }}
+  </tr>
+  {{ end }}
+</table>
