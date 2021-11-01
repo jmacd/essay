@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
-	"runtime"
 
 	"github.com/jmacd/essay"
 	"github.com/jmacd/essay/examples/kolmogorov/kolmogorov"
@@ -54,9 +52,7 @@ func main() {
 }
 
 func write(doc essay.Document) {
-	doc.Note(`This essay uses gonum/plot and gonum/stat/distuv to
-		display CDFs, PDFs, histograms, and samples drawn from
-		univariate distributions.`)
+	doc.Note(`Let's see.`)
 
 	doc.Section("Probability Distributions", noteDistributions)
 }
@@ -66,32 +62,48 @@ func noteDistributions(doc essay.Document) {
 	doc.Note(`Kolmo!!`, plot1(red, 0.99))
 
 }
+
 func plot1(color color.Color, show float64) essay.Renderer {
+	// const testN = 10
+	const many = 1000
+
 	p := plot.New()
 
-	pfunc := plotter.NewFunction(func(x float64) float64 {
-		defer func() {
-			if err := recover(); err != nil {
-				s := make([]byte, 4096)
-				s = s[0:runtime.Stack(s, false)]
-				fmt.Println("ERR", err, "\n", string(s))
-			}
-		}()
-		return kolmogorov.K(1000, x)
-	})
-	pfunc.Color = color
-	pfunc.Width = vg.Points(1)
-	pfunc.Samples = 100
+	// cdf := plotter.NewFunction(func(x float64) float64 {
+	// 	return kolmogorov.K(testN, x)
+	// })
+	// cdf.Color = color
+	// cdf.Width = vg.Points(1)
+	// cdf.Samples = many
 
-	p.Title.Text = "kolmogorov D(1000)"
+	p.Title.Text = "kolmogorov D"
 	p.Title.Padding = vg.Points(5)
 
-	// p.X.Min = dist.Quantile(1 - show)
-	// p.X.Max = dist.Quantile(show)
-	// p.Y.Min = 0
-	// p.Y.Max = dist.Prob(dist.Mode())
+	p.X.Min = 0
+	p.X.Max = 1
+	p.Y.Min = 0
+	p.Y.Max = 7
 
-	p.Add(plotter.NewGrid(), pfunc)
+	p.Add(plotter.NewGrid())
 
-	return num.Plot(p, 300, 300)
+	for testN := 2; testN <= 10; testN += 1 {
+		testN := testN
+		pdf := plotter.NewFunction(func(x float64) float64 {
+			const epsilon = 1e-7
+			return (kolmogorov.K(testN, x) - kolmogorov.K(testN, x-epsilon)) / epsilon
+		})
+		if testN == 10 {
+			pdf.Color = blue
+		} else if testN == 100 {
+			pdf.Color = red
+		} else {
+			pdf.Color = black
+		}
+		pdf.Width = vg.Points(1)
+		pdf.Samples = many
+
+		p.Add(pdf)
+	}
+
+	return num.Plot(p, 800, 800)
 }

@@ -5,7 +5,7 @@ import (
 	"image"
 	"math"
 
-	"github.com/lightstep/sandbox/jmacd/essay"
+	"github.com/jmacd/essay"
 	colorful "github.com/lucasb-eyer/go-colorful"
 )
 

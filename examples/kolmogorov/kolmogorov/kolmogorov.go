@@ -20,6 +20,9 @@ import (
 )
 
 func K(n int, d float64) float64 {
+	if d <= 0 {
+		return 0
+	}
 	// Omit the next two statements if you require >7 digit accuracy in the right tail.
 	s := d * d * float64(n)
 	if s > 7.24 || (s > 3.76 && n > 99) {
@@ -45,7 +48,6 @@ func K(n int, d float64) float64 {
 		H[(m-1)*m+i] -= math.Pow(h, float64(m-i))
 	}
 	if 2*h-1 > 0 {
-		// @@@ hmm
 		H[(m-1)*m] += math.Pow(2*h-1, float64(m))
 	}
 	for i := 0; i < m; i++ {
