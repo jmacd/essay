@@ -5,9 +5,9 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/lightstep/sandbox/jmacd/essay"
-	"github.com/lightstep/sandbox/jmacd/essay/num"
-	"github.com/lightstep/sandbox/jmacd/gonum/loghist"
+	"github.com/jmacd/essay"
+	"github.com/jmacd/essay/lib/gonum/loghist"
+	"github.com/jmacd/essay/num"
 	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -333,10 +333,7 @@ func noteHeavyTail(doc essay.Document) {
 }
 
 func plotHeavyCDF(dist HeavyDist, col color.Color, samples int) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	pfunc := plotter.NewFunction(dist.Prob)
 	pfunc.Color = col
@@ -367,10 +364,7 @@ func plotHeavyCDF(dist HeavyDist, col color.Color, samples int) essay.Renderer {
 }
 
 func plotHeavyCDF1Log(dist HeavyDist, col color.Color, samples int) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	pfunc := plotter.NewFunction(dist.Prob)
 	pfunc.Color = col
@@ -400,10 +394,7 @@ func plotHeavyCDF1Log(dist HeavyDist, col color.Color, samples int) essay.Render
 }
 
 func plotHeavyData1Log(dist HeavyDist, col color.Color, bins int, factor float64, data XY1D) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	s, err := plotter.NewHist(data, bins)
 	s.FillColor = col
@@ -428,18 +419,24 @@ func plotHeavyData1Log(dist HeavyDist, col color.Color, bins int, factor float64
 	return num.Plot(p, 300, 300)
 }
 
-func plotHeavyData(dist HeavyDist, col color.Color, bins int, factor float64, data XY1D) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
+func plotHeavyData(dist HeavyDist, col color.Color, count int, factor float64, data XY1D) essay.Renderer {
+	p := plot.New()
+
+	max := 0.0
+	// @@@ min/max
+	for _, v := range data {
+		max = math.Max(max, v)
 	}
 
-	s, err := loghist.NewHist(data, loghist.LinearTransformer{}, loghist.FixedBinner(bins))
-	s.FillColor = col
-	s.LineStyle.Width = vg.Points(0.5)
-	if err != nil {
-		panic(err)
+	transform := loghist.LinearTransformer{}
+	binner := loghist.NewFixedBinner(count, 0, max)
+	bins := binner.BinPoints(data, transform)
+	s := loghist.NewHistogram(transform, bins)
+	s.FillColors = make([]color.Color, count)
+	for i := 0; i < count; i++ {
+		s.FillColors[i] = col // @@@ colors
 	}
+	s.LineStyle.Width = vg.Points(0.5)
 	s.Normalize(1)
 
 	pfunc := plotter.NewFunction(dist.Prob)
@@ -577,10 +574,7 @@ func plotHist(dist Dist, col color.Color, show float64, bins int, cnt int) essay
 }
 
 func plotHistData(dist Dist, col color.Color, show float64, bins int, data XY1D) (essay.Renderer, *plot.Plot) {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	s, err := plotter.NewHist(data, bins)
 	s.FillColor = col
@@ -608,10 +602,7 @@ func plotHistData(dist Dist, col color.Color, show float64, bins int, data XY1D)
 }
 
 func plot1DExp(dist Dist, col color.Color, show float64, cnt int) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	vs := make(XY1D, cnt)
 	for i := 0; i < cnt; i++ {
@@ -644,10 +635,7 @@ func plot1DExp(dist Dist, col color.Color, show float64, cnt int) essay.Renderer
 }
 
 func plotCDF(dist Dist, col color.Color, show float64) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	pfunc := plotter.NewFunction(dist.Prob)
 	pfunc.Color = col
@@ -677,10 +665,7 @@ func plotCDF(dist Dist, col color.Color, show float64) essay.Renderer {
 }
 
 func plot1(dist Dist, color color.Color, show float64) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	pfunc := plotter.NewFunction(dist.Prob)
 	pfunc.Color = color
@@ -700,10 +685,7 @@ func plot1(dist Dist, color color.Color, show float64) essay.Renderer {
 }
 
 func plot2(title string, dist1, dist2 Dist, c1, c2 color.Color, show float64) essay.Renderer {
-	p, err := plot.New()
-	if err != nil {
-		panic(err)
-	}
+	p := plot.New()
 
 	pfunc1 := plotter.NewFunction(dist1.Prob)
 	pfunc1.Color = c1

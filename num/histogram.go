@@ -4,7 +4,7 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/lightstep/sandbox/jmacd/gonum/loghist"
+	"github.com/jmacd/essay/lib/gonum/loghist"
 	"gonum.org/v1/plot"
 )
 

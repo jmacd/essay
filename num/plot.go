@@ -5,7 +5,7 @@ import (
 	"image"
 	"math"
 
-	"github.com/lightstep/sandbox/jmacd/essay"
+	"github.com/jmacd/essay"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -181,7 +181,7 @@ func Plot(p *plot.Plot, w, h int) Builder {
 }
 
 func NewPlot() Builder {
-	p, _ := plot.New()
+	p := plot.New()
 	return Builder{
 		Plot:   p,
 		Width:  defaultWidth,

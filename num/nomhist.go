@@ -3,7 +3,7 @@ package num
 import (
 	"image/color"
 
-	"github.com/lightstep/sandbox/jmacd/gonum/nomhist"
+	"github.com/jmacd/essay/lib/gonum/nomhist"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 )
