@@ -4,7 +4,8 @@ import (
 	"image/color"
 
 	"github.com/jmacd/essay"
-	"github.com/jmacd/essay/examples/kolmogorov/kolmogorov"
+	"github.com/jmacd/essay/examples/kolmogorov/c"
+	kolmogorov "github.com/jmacd/essay/examples/kolmogorov/go"
 	"github.com/jmacd/essay/num"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -64,45 +65,39 @@ func noteDistributions(doc essay.Document) {
 }
 
 func plot1(color color.Color, show float64) essay.Renderer {
-	// const testN = 10
 	const many = 1000
 
 	p := plot.New()
 
-	// cdf := plotter.NewFunction(func(x float64) float64 {
-	// 	return kolmogorov.K(testN, x)
-	// })
-	// cdf.Color = color
-	// cdf.Width = vg.Points(1)
-	// cdf.Samples = many
-
-	p.Title.Text = "kolmogorov D"
+	p.Title.Text = "PDF(D)"
 	p.Title.Padding = vg.Points(5)
 
 	p.X.Min = 0
 	p.X.Max = 1
 	p.Y.Min = 0
-	p.Y.Max = 7
+	p.Y.Max = 6
 
 	p.Add(plotter.NewGrid())
 
 	for testN := 2; testN <= 10; testN += 1 {
+		const epsilon = 1e-7
 		testN := testN
-		pdf := plotter.NewFunction(func(x float64) float64 {
-			const epsilon = 1e-7
+
+		gpdf := plotter.NewFunction(func(x float64) float64 {
 			return (kolmogorov.K(testN, x) - kolmogorov.K(testN, x-epsilon)) / epsilon
 		})
-		if testN == 10 {
-			pdf.Color = blue
-		} else if testN == 100 {
-			pdf.Color = red
-		} else {
-			pdf.Color = black
-		}
-		pdf.Width = vg.Points(1)
-		pdf.Samples = many
+		gpdf.Color = blue
+		gpdf.Width = vg.Points(3)
+		gpdf.Samples = many
+		p.Add(gpdf)
 
-		p.Add(pdf)
+		cpdf := plotter.NewFunction(func(x float64) float64 {
+			return (c.K(testN, x) - c.K(testN, x-epsilon)) / epsilon
+		})
+		cpdf.Color = green
+		cpdf.Width = vg.Points(1)
+		cpdf.Samples = many
+		p.Add(cpdf)
 	}
 
 	return num.Plot(p, 800, 800)
