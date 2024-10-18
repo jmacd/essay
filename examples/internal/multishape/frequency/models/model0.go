@@ -35,7 +35,7 @@ func (m0 model0) Update(sampled ms.Population, scale sampler.Scale) sampler.Scal
 	lweights := sampled.Weights()
 
 	// Count known colors
-	colormap, _, _ := sampled.Categorize(m0.colorVar)
+	colormap := sampled.Categorize(m0.colorVar).Indexed
 	numColors := len(colormap)
 
 	latencyDigest := m0.lquality.New(

@@ -343,6 +343,7 @@ func sampleExample(doc essay.Document) {
 			Legend().
 			Add(num.NewHistogram().
 				Normalize().
+				// @@@ Note this call is having a panic, it's hard to debug!
 				EqualBins(latencies, numBins).
 				Name("Empirical").
 				LineColor(red).

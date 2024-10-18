@@ -128,6 +128,10 @@ func (u UnitYs) XY(i int) (float64, float64) {
 	return u.Value(i), 1.0
 }
 
+func (u UnitYs) XYok(i int) (float64, float64, bool) {
+	return u.Value(i), 1.0, true
+}
+
 // Plot implements the Plotter interface, drawing a line
 // that connects each point in the Line.
 func (h *Histogram) Plot(c draw.Canvas, p *plot.Plot) {
@@ -292,7 +296,6 @@ func (b LinearBinner) BinPoints(xys plotter.XYer, transform DataTransformer) []H
 			bin.Sum += v
 			idx++
 		}
-		fmt.Println("Bin with", bin)
 		bins = append(bins, bin)
 	}
 	return bins

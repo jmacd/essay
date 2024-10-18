@@ -30,6 +30,7 @@ func (e Essay) RenderImage(img EncodedImage) (interface{}, error) {
 }
 
 func Image(i image.Image) EncodedImage {
+	defer recovery.Here()()
 	var buf bytes.Buffer
 
 	if err := png.Encode(&buf, i); err != nil {

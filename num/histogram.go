@@ -35,10 +35,10 @@ func (h HBuilder) Transformer(trans loghist.DataTransformer) HBuilder {
 	return h
 }
 
-func (h HBuilder) EqualBins(values []float64, numBins int) HBuilder {
+func (h HBuilder) EqualBins(xys plotter.XYer, numBins int) HBuilder {
 	defer recovery.Here()()
 	// TODO: This doesn't belong here, right?
-	h.bins = loghist.NewLinearBinner(numBins).BinPoints(loghist.UnitYs{plotter.Values(values)}, loghist.LinearTransformer{})
+	h.bins = loghist.NewLinearBinner(numBins).BinPoints(xys, loghist.LinearTransformer{})
 	return h
 }
 

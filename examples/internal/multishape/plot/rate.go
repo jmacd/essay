@@ -5,6 +5,7 @@ import (
 
 	ms "github.com/jmacd/essay/examples/internal/multishape"
 	"github.com/jmacd/essay/examples/internal/multishape/universe"
+	"github.com/jmacd/essay/internal/recovery"
 	"github.com/jmacd/essay/num"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -55,6 +56,7 @@ func (r RBuilder) ColorMap(colormap map[ms.Category]int) RBuilder {
 }
 
 func (r RBuilder) Build() num.Builder {
+	defer recovery.Here()()
 	var ranges []ms.Population
 
 	r.points.Interval(universe.Time, r.period).

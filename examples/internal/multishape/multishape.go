@@ -128,6 +128,7 @@ func (ind *Individual) Weight() float64 {
 	return ind.weight
 }
 
+// @@@ TODO This needs a comment
 type Categories struct {
 	Var     Variable
 	Indexed map[Category]int

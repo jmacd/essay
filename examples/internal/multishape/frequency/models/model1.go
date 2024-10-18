@@ -41,7 +41,7 @@ func (m1 model1) Update(inputSampled ms.Population, prior sampler.Scale) sampler
 	latencies := sampled.Numbers(m1.latencyVar)
 
 	// Count known colors
-	colormap, _, _ := sampled.Categorize(m1.colorVar)
+	colormap := sampled.Categorize(m1.colorVar).Indexed
 	numColors := len(colormap)
 
 	latencyDigest := m1.lquality.New(

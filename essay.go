@@ -183,7 +183,6 @@ func (e *Essay) render(arg interface{}) (interface{}, error) {
 	defer recovery.Here()()
 	switch t := arg.(type) {
 	case string, template.HTML:
-		fmt.Println("render", arg)
 		return arg, nil
 	case Renderer:
 		return t.Render(e)

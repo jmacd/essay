@@ -6,6 +6,7 @@ import (
 	"math"
 
 	ms "github.com/jmacd/essay/examples/internal/multishape"
+	"github.com/jmacd/essay/lib/gonum/loghist"
 	"github.com/jmacd/essay/num"
 	"gonum.org/v1/plot/plotter"
 )
@@ -57,24 +58,27 @@ func ColorHistogramBy(points ms.Population, v ms.Variable, colormap map[ms.Categ
 		}))
 }
 
-// func LatencyHistogram(points ms.Population, v ms.Variable, maxLatency float64, sz int) num.Builder {
-// 	return num.NewPlot().
-// 		Size(sz, sz).
-// 		X(num.Axis().Min(0).Max(maxLatency)).
-// 		Y(num.Axis().Min(0)).
-// 		Add(num.WeightedHistogram(points.WeightedNumbers(v)).
-// 			Bins(showHistoBins).
-// 			LineColor(Black).
-// 			FillColor(CoolToHotSequentialPalette(showHistoBins)))
-// }
+func LatencyHistogram(points ms.Population, v ms.Variable, maxLatency float64, sz int, col color.Color, title string) num.Builder {
+	return num.NewPlot().
+		Size(sz, sz).
+		X(num.Axis().Min(0).Max(maxLatency)).
+		Y(num.Axis().Min(0)).
+		Title(title).
+		Add(num.NewHistogram().
+			EqualBins(points.WeightedNumbers(v), showHistoBins).
+			LineColor(Black).
+			FillColors([]color.Color{col}))
+}
 
-// func UnweightedLatencyHistogram(points ms.Population, v ms.Variable, colormap []color.Color, maxLatency float64, sz int) num.Builder {
-// 	return num.NewPlot().
-// 		Size(sz, sz).
-// 		X(num.Axis().Min(0).Max(maxLatency)).
-// 		Y(num.Axis().Min(0)).
-// 		Add(num.Float64Histogram(points.Numbers(v)).
-// 			Bins(showHistoBins).
-// 			LineColor(Black).
-// 			FillColor(CoolToHotSequentialPalette(showHistoBins)))
-// }
+func UnweightedLatencyHistogram(points ms.Population, v ms.Variable, colormap []color.Color, maxLatency float64, sz int) num.Builder {
+
+	numbers := loghist.UnitYs{plotter.Values(points.Numbers(v))}
+	return num.NewPlot().
+		Size(sz, sz).
+		X(num.Axis().Min(0).Max(maxLatency)).
+		Y(num.Axis().Min(0)).
+		Add(num.NewHistogram().
+			EqualBins(numbers, showHistoBins).
+			LineColor(Black).
+			FillColors(colormap))
+}

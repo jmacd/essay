@@ -40,7 +40,7 @@ func NewModel2(colorVar ms.Variable) sampler.Model {
 
 func (m2 model2) Update(inputSampled ms.Population, prior sampler.Scale) sampler.Scale {
 	inputSampled = inputSampled.Copy()
-	colormapInput, _, _ := inputSampled.Categorize(m2.colorVar)
+	colormapInput := inputSampled.Categorize(m2.colorVar).Indexed
 
 	numColors := len(colormapInput)
 	numPoints := len(inputSampled)
