@@ -1,6 +1,10 @@
 package essay
 
-import "math"
+import (
+	"math"
+
+	"github.com/jmacd/essay/internal/recovery"
+)
 
 type (
 	Table struct {
@@ -11,10 +15,12 @@ type (
 )
 
 func (t Table) Render(builtin Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	return builtin.RenderTable(t)
 }
 
 func (e *Essay) RenderTable(t Table) (interface{}, error) {
+	defer recovery.Here()()
 	return e.execute("table.html", t)
 }
 

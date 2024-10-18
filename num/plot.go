@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/jmacd/essay"
+	"github.com/jmacd/essay/internal/recovery"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -52,6 +53,7 @@ type (
 )
 
 func (builder Builder) Render(builtin essay.Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	img := builder.Image(essay.PNG)
 	return builtin.RenderImage(img)
 }

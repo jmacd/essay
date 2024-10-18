@@ -11,6 +11,8 @@ import (
 	"path"
 	"reflect"
 	"strings"
+
+	"github.com/jmacd/essay/internal/recovery"
 )
 
 type (
@@ -144,7 +146,7 @@ func (e *Essay) section(section interface{}) (interface{}, error) {
 	return e.execute("section.html", section)
 }
 
-func (e *Essay) execute(name string, arg interface{}) (template.HTML, error) {
+func (e *Essay) execute(name string, arg interface{}) (_ template.HTML, retErr error) {
 	var buf bytes.Buffer
 
 	if err := e.Essay.tmpl.ExecuteTemplate(&buf, name, arg); err != nil {
@@ -178,14 +180,10 @@ func (d *structuredDoc) add(c interface{}) {
 }
 
 func (e *Essay) render(arg interface{}) (interface{}, error) {
-	// defer func() {
-	// 	if err := recover(); err != nil {
-	// 		fmt.Println("Recovered panic", err)
-	// 		return
-	// 	}
-	// }()
+	defer recovery.Here()()
 	switch t := arg.(type) {
 	case string, template.HTML:
+		fmt.Println("render", arg)
 		return arg, nil
 	case Renderer:
 		return t.Render(e)
@@ -199,12 +197,14 @@ func (e *Essay) render(arg interface{}) (interface{}, error) {
 }
 
 func (n *noteRenderer) Render(Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	return n.execute("note.html", struct {
 		Divs []interface{}
 	}{Divs: n.divs})
 }
 
 func (s *sectionRenderer) Render(Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	defer s.descend().ascend()
 	return s.execute("section.html", struct {
 		Heading string
@@ -214,6 +214,7 @@ func (s *sectionRenderer) Render(Builtin) (interface{}, error) {
 }
 
 func (d *displayRenderer) Render(Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	return d.execute("display.html", struct {
 		Type  string
 		Depth int
@@ -222,6 +223,7 @@ func (d *displayRenderer) Render(Builtin) (interface{}, error) {
 }
 
 func (e *Essay) renderNamedDisplayer(displayer Displayer) (interface{}, error) {
+	defer recovery.Here()()
 	defer e.descend().ascend()
 	dtype := simplifyType(displayer)
 	if stringer, ok := displayer.(fmt.Stringer); ok {
@@ -232,6 +234,7 @@ func (e *Essay) renderNamedDisplayer(displayer Displayer) (interface{}, error) {
 }
 
 func (e *Essay) renderDisplayer(dtype string, displayer Displayer) (interface{}, error) {
+	defer recovery.Here()()
 	dd := &displayRenderer{
 		dtype: dtype,
 	}
@@ -257,7 +260,11 @@ func base64Encode(in []byte) template.HTML {
 }
 
 func indexOf(slice interface{}, idx int) interface{} {
-	return reflect.ValueOf(slice).Index(idx).Interface()
+	sval := reflect.ValueOf(slice)
+	if sval.Len() <= idx {
+		return "ERROR@@@"
+	}
+	return sval.Index(idx).Interface()
 }
 
 func Main(title string, writer func(Document)) {
@@ -277,5 +284,6 @@ func Main(title string, writer func(Document)) {
 }
 
 func (f funcDisplayer) Display(doc Document) {
+	defer recovery.Here()()
 	f.docf(doc)
 }
