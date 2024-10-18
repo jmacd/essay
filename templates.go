@@ -11,7 +11,7 @@ import (
 // 	)
 // )
 
-const tmplPath = "/Users/jmacd/src/essay/tmpl" // @@@
+const tmplPath = "/Users/josh.macdonald/src/essay/tmpl" // @@@
 
 func templateGlobPath() string {
 	return path.Join(tmplPath, "*")

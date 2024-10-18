@@ -6,6 +6,7 @@ import (
 	"image/gif"
 
 	"github.com/andybons/gogif"
+	"github.com/jmacd/essay/internal/recovery"
 )
 
 const gifPeriods = 5
@@ -32,6 +33,7 @@ func (g GBuilder) Add(i EncodedImage) GBuilder {
 }
 
 func (g GBuilder) Render(builtin Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	outGif := &gif.GIF{}
 	for _, simage := range g.Images {
 		sbounds := simage.Bounds

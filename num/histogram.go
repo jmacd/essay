@@ -4,8 +4,10 @@ import (
 	"image/color"
 	"math"
 
+	"github.com/jmacd/essay/internal/recovery"
 	"github.com/jmacd/essay/lib/gonum/loghist"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
 )
 
 type (
@@ -30,6 +32,13 @@ func NewHistogram() HBuilder {
 
 func (h HBuilder) Transformer(trans loghist.DataTransformer) HBuilder {
 	h.trans = trans
+	return h
+}
+
+func (h HBuilder) EqualBins(xys plotter.XYer, numBins int) HBuilder {
+	defer recovery.Here()()
+	// TODO: This doesn't belong here, right?
+	h.bins = loghist.NewLinearBinner(numBins).BinPoints(xys, loghist.LinearTransformer{})
 	return h
 }
 

@@ -69,6 +69,10 @@ type (
 		Min   float64
 		Max   float64
 	}
+
+	LinearBinner struct {
+		Count int
+	}
 )
 
 func NewFixedBinner(count int, min, max float64) FixedBinner {
@@ -76,6 +80,12 @@ func NewFixedBinner(count int, min, max float64) FixedBinner {
 		Count: count,
 		Min:   min,
 		Max:   max,
+	}
+}
+
+func NewLinearBinner(count int) LinearBinner {
+	return LinearBinner{
+		Count: count,
 	}
 }
 
@@ -107,15 +117,19 @@ func NewHistogram(transform DataTransformer, bins []HistogramBin) *Histogram {
 }
 
 func ValuerToBins(vs plotter.Valuer, transform DataTransformer, binner Binner) []HistogramBin {
-	return binner.BinPoints(unitYs{vs}, transform)
+	return binner.BinPoints(UnitYs{vs}, transform)
 }
 
-type unitYs struct {
+type UnitYs struct {
 	plotter.Valuer
 }
 
-func (u unitYs) XY(i int) (float64, float64) {
+func (u UnitYs) XY(i int) (float64, float64) {
 	return u.Value(i), 1.0
+}
+
+func (u UnitYs) XYok(i int) (float64, float64, bool) {
+	return u.Value(i), 1.0, true
 }
 
 // Plot implements the Plotter interface, drawing a line
@@ -262,4 +276,27 @@ func (l LogTransformer) Invert(g float64) float64 { return math.Exp(g) }
 
 func (f FixedBinner) BinPoints(xys plotter.XYer, transform DataTransformer) []HistogramBin {
 	return f.binPoints(xys, transform)
+}
+
+func (b LinearBinner) BinPoints(xys plotter.XYer, transform DataTransformer) []HistogramBin {
+	avg := float64(xys.Len()) / float64(b.Count)
+
+	var bins []HistogramBin
+	var idx int
+	for i := 1; i <= b.Count; i++ {
+		bin := HistogramBin{
+			Min: math.Inf(+1),
+			Max: math.Inf(-1),
+		}
+		for idx < int(math.Round(float64(i)*avg)) {
+			v, w := xys.XY(idx)
+			bin.Min = min(bin.Min, v)
+			bin.Max = max(bin.Max, v)
+			bin.Weight += w
+			bin.Sum += v
+			idx++
+		}
+		bins = append(bins, bin)
+	}
+	return bins
 }

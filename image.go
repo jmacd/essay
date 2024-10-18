@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+
+	"github.com/jmacd/essay/internal/recovery"
 )
 
 const (
@@ -23,10 +25,12 @@ type (
 )
 
 func (e Essay) RenderImage(img EncodedImage) (interface{}, error) {
+	defer recovery.Here()()
 	return e.execute("image.html", img)
 }
 
 func Image(i image.Image) EncodedImage {
+	defer recovery.Here()()
 	var buf bytes.Buffer
 
 	if err := png.Encode(&buf, i); err != nil {
@@ -40,6 +44,7 @@ func Image(i image.Image) EncodedImage {
 }
 
 func (i EncodedImage) Render(builtin Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	return builtin.RenderImage(i)
 }
 

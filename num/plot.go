@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/jmacd/essay"
+	"github.com/jmacd/essay/internal/recovery"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -52,6 +53,7 @@ type (
 )
 
 func (builder Builder) Render(builtin essay.Builtin) (interface{}, error) {
+	defer recovery.Here()()
 	img := builder.Image(essay.PNG)
 	return builtin.RenderImage(img)
 }
@@ -151,6 +153,7 @@ func (builder Builder) setupPlot() {
 }
 
 func (builder Builder) Image(kind essay.ImageKind) essay.EncodedImage {
+	defer recovery.Here()()
 	builder.setupPlot()
 
 	w := vg.Length(builder.Width)
@@ -162,10 +165,11 @@ func (builder Builder) Image(kind essay.ImageKind) essay.EncodedImage {
 	} else if _, err := writer.WriteTo(&buf); err != nil {
 		panic(err)
 	}
+
 	return essay.EncodedImage{
 		Kind: kind,
 		Bounds: image.Rectangle{
-			Min: image.ZP,
+			Min: image.Point{},
 			Max: image.Pt(builder.Width, builder.Height),
 		},
 		Data: buf.Bytes(),
